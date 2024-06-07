@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Forum.Application.DTOs;
 using Forum.Application.Interfaces;
+using Forum.Core.Common.Enums;
 using Forum.Core.Common.Exceptions;
 using Forum.Core.Entities;
 using Forum.Core.Interfaces;
@@ -23,6 +24,10 @@ namespace Forum.Application.Services
         {
             if (model == null) throw new ArgumentNullException("Invalid argument passed");
             var result = _mapper.Map<Topic>(model);
+            result.CreationDate = DateTime.Now;
+            result.UserId = _authService.GetAuthenticatedUserId();
+            result.Status = Status.Active;
+            result.State = State.Pending;
             await _topicRepository.AddTopicAsync(result);
             await _topicRepository.Save();
         }
@@ -67,11 +72,16 @@ namespace Forum.Application.Services
         public async Task UpdateTopicAsync(TopicForUpdatingDTO model)
         {
             if (model == null) throw new ArgumentNullException("Invalid argument passed");
-            if (model.UserId != _authService.GetAuthenticatedUserId() && _authService.GetAuthenticatedUserRole() != "Admin")
+            var topicToUpdate = await _topicRepository.GetSingleTopicAsync(x => x.Id == model.Id);
+            if (topicToUpdate == null) throw new TopicNotFoundException();
+            if (topicToUpdate.UserId != _authService.GetAuthenticatedUserId() && _authService.GetAuthenticatedUserRole() != "Admin")
             {
                 throw new UnauthorizedAccessException("Cant update other users topics");
-            }
-            await _topicRepository.UpdateTopicAsync(_mapper.Map<Topic>(model));
+            }            
+            var result = _mapper.Map<Topic>(model);
+            result.CreationDate = topicToUpdate.CreationDate;
+            result.UserId = topicToUpdate.UserId;
+            await _topicRepository.UpdateTopicAsync(result);
             await _topicRepository.Save();
         }
     }

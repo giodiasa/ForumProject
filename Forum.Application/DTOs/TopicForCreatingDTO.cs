@@ -11,13 +11,5 @@ namespace Forum.Application.DTOs
         [Required]
         [MaxLength(200)]
         public string Title { get; set; } = string.Empty;
-        [Required]
-        public DateTime CreationDate { get; set; }
-        [Required]
-        public State State { get; set; } = State.Pending;
-        [Required]
-        public Status Status { get; set; } = Status.Active;
-        [ForeignKey(nameof(IdentityUser))]
-        public string UserId { get; set; } = string.Empty;
     }
 }
