@@ -66,7 +66,10 @@ namespace Forum.Application.Services
             {
                 throw new UnauthorizedAccessException("Cant update other users");
             }
-            await _userRepository.UpdateUserAsync(_mapper.Map<IdentityUser>(model));
+            var result = _mapper.Map<IdentityUser>(model);
+            result.NormalizedUserName = model.UserName.ToUpper();
+            result.NormalizedEmail = model.Email.ToUpper();
+            await _userRepository.UpdateUserAsync(result);
             await _userRepository.Save();
         }
     }

@@ -97,8 +97,8 @@ namespace Forum.Application.Services
         {
             IdentityUser user = new()
             {
-                UserName = registrationRequestDto.Email,
-                NormalizedUserName = registrationRequestDto.Email.ToUpper(),
+                UserName = registrationRequestDto.UserName,
+                NormalizedUserName = registrationRequestDto.UserName.ToUpper(),
                 Email = registrationRequestDto.Email,
                 NormalizedEmail = registrationRequestDto.Email.ToUpper(),
                 PhoneNumber = registrationRequestDto.PhoneNumber

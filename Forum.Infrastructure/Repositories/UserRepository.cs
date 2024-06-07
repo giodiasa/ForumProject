@@ -49,6 +49,8 @@ namespace Forum.Infrastructure.Repositories
                     userToUpdate.Email = entity.Email;
                     userToUpdate.PhoneNumber = entity.PhoneNumber;
                     userToUpdate.UserName = entity.UserName;
+                    userToUpdate.NormalizedEmail = entity.NormalizedEmail;
+                    userToUpdate.NormalizedUserName = entity.NormalizedUserName;
 
                     _context.Users.Update(userToUpdate);
                 }
