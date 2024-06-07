@@ -4,7 +4,6 @@ using Forum.Application.Interfaces;
 using Forum.Core.Common.Exceptions;
 using Forum.Core.Entities;
 using Forum.Core.Interfaces;
-using System.Linq.Expressions;
 
 namespace Forum.Application.Services
 {
@@ -13,31 +12,31 @@ namespace Forum.Application.Services
         private readonly ICommentRepository _commentRepository;
         private readonly IMapper _mapper;
         private readonly IAuthService _authService;
+        private readonly ITopicRepository _topicRepository;
 
-        public CommentService(ICommentRepository commentRepository, IAuthService authService)
+        public CommentService(ICommentRepository commentRepository, IAuthService authService, ITopicRepository topicRepository)
         {
             _commentRepository = commentRepository;
             _mapper = MappingInitializer.Initialize();
             _authService = authService;
+            _topicRepository = topicRepository;
         }
         public async Task AddCommentAsync(CommentForCreatingDTO model)
         {
             if (model == null) throw new ArgumentNullException("Invalid argument passed");
-            if(model.UserId != _authService.GetAuthenticatedUserId())
-            {
-                throw new UnauthorizedAccessException("User is not authorized to add comment for another user.");
-            }
             var result = _mapper.Map<Comment>(model);
+            result.CreationDate = DateTime.Now;
+            result.UserId = _authService.GetAuthenticatedUserId();
             await _commentRepository.AddCommentAsync(result);
             await _commentRepository.Save();
         }
 
         public async Task DeleteCommentAsync(int Id)
         {
-            if(Id <= 0) throw new ArgumentOutOfRangeException("Invalid argument passed");
-            var comment = await _commentRepository.GetSingleCommentAsync(x=> x.Id ==  Id);
+            if (Id <= 0) throw new ArgumentOutOfRangeException("Invalid argument passed");
+            var comment = await _commentRepository.GetSingleCommentAsync(x => x.Id == Id);
             if (comment == null) throw new CommentNotFoundException();
-            if(comment.UserId != _authService.GetAuthenticatedUserId() && _authService.GetAuthenticatedUserRole() != "Admin")
+            if (comment.UserId != _authService.GetAuthenticatedUserId() && _authService.GetAuthenticatedUserRole() != "Admin")
             {
                 throw new UnauthorizedAccessException("Cant delete other users comments");
             }
@@ -51,7 +50,9 @@ namespace Forum.Application.Services
         public async Task<List<CommentForGettingDTO>> GetAllCommentsOfTopicAsync(int topicId)
         {
             if (topicId <= 0) throw new ArgumentOutOfRangeException("Invalid argument passed");
-            var comments = await _commentRepository.GetAllCommentsAsync(x=> x.TopicId ==  topicId);
+            var topic = await _topicRepository.GetSingleTopicAsync(x => x.Id == topicId);
+            if (topic == null) throw new TopicNotFoundException();
+            var comments = await _commentRepository.GetAllCommentsAsync(x => x.TopicId == topicId);
             var result = _mapper.Map<List<CommentForGettingDTO>>(comments);
             return result;
         }
@@ -59,7 +60,7 @@ namespace Forum.Application.Services
         public async Task<CommentForGettingDTO> GetSingleCommentAsync(int Id)
         {
             if (Id <= 0) throw new ArgumentOutOfRangeException("Invalid argument passed");
-            var comment = await _commentRepository.GetSingleCommentAsync(x=> x.Id ==Id);
+            var comment = await _commentRepository.GetSingleCommentAsync(x => x.Id == Id);
             if (comment == null) throw new CommentNotFoundException();
             if (comment.UserId != _authService.GetAuthenticatedUserId() && _authService.GetAuthenticatedUserRole() != "Admin")
             {
@@ -72,12 +73,18 @@ namespace Forum.Application.Services
 
         public async Task UpdateCommentAsync(CommentForUpdatingDTO model)
         {
-            if(model  == null) throw new ArgumentNullException("Invalid argument passed");
-            if(model.UserId != _authService.GetAuthenticatedUserId() && _authService.GetAuthenticatedUserRole() != "Admin")
+            if (model == null) throw new ArgumentNullException("Invalid argument passed");
+            var commentToUpdate = await _commentRepository.GetSingleCommentAsync(x => x.Id == model.Id);
+            if (commentToUpdate == null) throw new CommentNotFoundException();
+            if (commentToUpdate.UserId != _authService.GetAuthenticatedUserId() && _authService.GetAuthenticatedUserRole() != "Admin")
             {
                 throw new UnauthorizedAccessException("Cant update other users comments");
             }
-            await _commentRepository.UpdateCommentAsync(_mapper.Map<Comment>(model));
+            var result = _mapper.Map<Comment>(model);
+            result.UserId = commentToUpdate.UserId;
+            result.TopicId = commentToUpdate.TopicId;
+            result.CreationDate = commentToUpdate.CreationDate;
+            await _commentRepository.UpdateCommentAsync(result);
             await _commentRepository.Save();
         }
     }

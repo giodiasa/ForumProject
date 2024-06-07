@@ -9,11 +9,7 @@ namespace Forum.Application.DTOs
     {
         [Required]
         public string Text { get; set; } = string.Empty;
-        [Required]
-        public DateTime CreationDate { get; set; }
         [ForeignKey(nameof(Topic))]
         public int TopicId { get; set; }
-        [ForeignKey(nameof(IdentityUser))]
-        public string UserId { get; set; } = string.Empty;
     }
 }

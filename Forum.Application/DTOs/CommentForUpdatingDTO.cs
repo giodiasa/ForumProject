@@ -13,11 +13,5 @@ namespace Forum.Application.DTOs
         public int Id { get; set; }
         [Required]
         public string Text { get; set; } = string.Empty;
-        [Required]
-        public DateTime CreationDate { get; set; }
-        [ForeignKey(nameof(Topic))]
-        public int TopicId { get; set; }
-        [ForeignKey(nameof(IdentityUser))]
-        public string UserId { get; set; } = string.Empty;
     }
 }

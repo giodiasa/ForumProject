@@ -1,8 +1,6 @@
 ﻿using Forum.Application.DTOs;
 using Forum.Application.Interfaces;
-using Forum.Core.Entities;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -21,7 +19,7 @@ namespace Forum.API.Controllers
             _response = new();
         }
 
-        [HttpGet("/comments")]
+        [HttpGet("bytopic/{topicId}")]
         public async Task<IActionResult> AllCommentsOfTopic(int topicId)
         {
             var result = await _commentService.GetAllCommentsOfTopicAsync(topicId);
@@ -33,7 +31,7 @@ namespace Forum.API.Controllers
             return StatusCode(_response.StatusCode, _response);
         }
 
-        [HttpGet("/comments/{id}")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> TodoById(int id)
         {
             var result = await _commentService.GetSingleCommentAsync(id);
@@ -47,7 +45,7 @@ namespace Forum.API.Controllers
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> AddComment(CommentForCreatingDTO model)
+        public async Task<IActionResult> AddComment([FromForm]CommentForCreatingDTO model)
         {
             await _commentService.AddCommentAsync(model);
             _response.Result = model;
@@ -58,7 +56,7 @@ namespace Forum.API.Controllers
             return StatusCode(_response.StatusCode, _response);
         }
 
-        [HttpDelete]
+        [HttpDelete("{id}")]
         [Authorize]
         public async Task<IActionResult> DeleteComment(int id)
         {
@@ -67,6 +65,20 @@ namespace Forum.API.Controllers
             _response.IsSuccess = true;
             _response.StatusCode = Convert.ToInt32(HttpStatusCode.OK);
             _response.Message = "Comment deleted successfully";
+
+
+            return StatusCode(_response.StatusCode, _response);
+        }
+
+        [HttpPut]
+        [Authorize]
+        public async Task<IActionResult> UpdateComment([FromForm] CommentForUpdatingDTO model)
+        {
+            await _commentService.UpdateCommentAsync(model);
+            _response.Result = model;
+            _response.IsSuccess = true;
+            _response.StatusCode = Convert.ToInt32(HttpStatusCode.OK);
+            _response.Message = "Comment updated successfully";
 
 
             return StatusCode(_response.StatusCode, _response);
