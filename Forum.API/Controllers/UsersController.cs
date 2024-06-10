@@ -3,6 +3,7 @@ using Forum.Application.Interfaces;
 using Forum.Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -66,6 +67,19 @@ namespace Forum.API.Controllers
         {
             await _userService.UpdateUserAsync(model);
             _response.Result = model;
+            _response.IsSuccess = true;
+            _response.StatusCode = Convert.ToInt32(HttpStatusCode.OK);
+            _response.Message = "Request completed successfully";
+
+            return StatusCode(_response.StatusCode, _response);
+        }
+
+        [HttpPatch ("lockout/{userId}")]
+        [Authorize(Roles ="Admin")]
+        public async Task<IActionResult> UpdateLockoutStatus(string userId, [FromBody] JsonPatchDocument<UserDto> patchDocument)
+        {
+            await _userService.LockUser(userId, patchDocument);
+            _response.Result = userId;
             _response.IsSuccess = true;
             _response.StatusCode = Convert.ToInt32(HttpStatusCode.OK);
             _response.Message = "Request completed successfully";

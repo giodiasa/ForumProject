@@ -4,6 +4,7 @@ using Forum.Application.Interfaces;
 using Forum.Core.Common.Exceptions;
 using Forum.Core.Interfaces;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace Forum.Application.Services
 {
@@ -57,6 +58,18 @@ namespace Forum.Application.Services
             if (user == null) throw new UserNotFoundException();
             var result = _mapper.Map<UserDto>(user);
             return result;
+        }
+
+        public async Task LockUser(string userId, JsonPatchDocument<UserDto> patchDocument)
+        {
+            if(userId == null) throw new ArgumentNullException("Invalid argument passed");
+            var user = await _userRepository.GetSingleUserAsync(x => x.Id == userId);
+            if(user == null) throw new UserNotFoundException();
+
+            var userToLock = _mapper.Map<UserDto>(user);
+            patchDocument.ApplyTo(userToLock);
+            _mapper.Map(userToLock, user);
+            await _userRepository.Save();
         }
 
         public async Task UpdateUserAsync(UserDto model)

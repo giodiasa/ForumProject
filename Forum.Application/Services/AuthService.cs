@@ -42,6 +42,10 @@ namespace Forum.Application.Services
                     User = null!
                 };
             }
+            if (user.LockoutEnd > DateTime.UtcNow) 
+            {
+                throw new UnauthorizedAccessException("User is locked");
+            }
             var roles = await _userManager.GetRolesAsync(user);
             var token = _jwtGenerator.GenerateJwtToken(user, roles);
 

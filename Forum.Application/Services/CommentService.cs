@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Forum.Application.DTOs;
 using Forum.Application.Interfaces;
+using Forum.Core.Common.Enums;
 using Forum.Core.Common.Exceptions;
 using Forum.Core.Entities;
 using Forum.Core.Interfaces;
@@ -23,6 +24,12 @@ namespace Forum.Application.Services
         }
         public async Task AddCommentAsync(CommentForCreatingDTO model)
         {
+            var topic = await _topicRepository.GetSingleTopicAsync(x=> x.Id == model.TopicId);
+            if (topic == null) { throw new TopicNotFoundException(); }
+            if(topic.Status == Status.Inactive)
+            {
+                throw new UnauthorizedAccessException("Cant comment on inactive topic");
+            }
             if (model == null) throw new ArgumentNullException("Invalid argument passed");
             var result = _mapper.Map<Comment>(model);
             result.CreationDate = DateTime.Now;

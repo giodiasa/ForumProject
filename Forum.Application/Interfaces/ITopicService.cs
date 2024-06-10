@@ -1,5 +1,7 @@
 ﻿using Forum.Application.DTOs;
+using Forum.Application.Identity;
 using Forum.Core.Entities;
+using Microsoft.AspNetCore.JsonPatch;
 using System.Linq.Expressions;
 
 namespace Forum.Application.Interfaces
@@ -11,5 +13,6 @@ namespace Forum.Application.Interfaces
         Task AddTopicAsync(TopicForCreatingDTO model);
         Task UpdateTopicAsync(TopicForUpdatingDTO model);
         Task DeleteTopicAsync(int Id);
+        Task ChangeStateOfTopic(int Id, JsonPatchDocument<TopicForUpdatingDTO> patchDocument);
     }
 }

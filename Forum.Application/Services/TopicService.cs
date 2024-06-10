@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
 using Forum.Application.DTOs;
+using Forum.Application.Identity;
 using Forum.Application.Interfaces;
 using Forum.Core.Common.Enums;
 using Forum.Core.Common.Exceptions;
 using Forum.Core.Entities;
 using Forum.Core.Interfaces;
+using Forum.Infrastructure.Repositories;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace Forum.Application.Services
 {
@@ -32,6 +35,18 @@ namespace Forum.Application.Services
             await _topicRepository.Save();
         }
 
+        public async Task ChangeStateOfTopic(int Id, JsonPatchDocument<TopicForUpdatingDTO> patchDocument)
+        {
+            if (Id <= 0) throw new ArgumentOutOfRangeException("Invalid argument passed");
+            var topic = await _topicRepository.GetSingleTopicAsync(x => x.Id == Id);
+            if (topic == null) throw new TopicNotFoundException();
+
+            var topicToChange = _mapper.Map<TopicForUpdatingDTO>(topic);
+            patchDocument.ApplyTo(topicToChange);
+            _mapper.Map(topicToChange, topic);
+            await _topicRepository.Save();
+        }
+
         public async Task DeleteTopicAsync(int Id)
         {
             if (Id <= 0) throw new ArgumentOutOfRangeException("Invalid argument passed");
@@ -50,7 +65,7 @@ namespace Forum.Application.Services
 
         public async Task<List<TopicForGettingDTO>> GetAllTopicsAsync()
         {
-            var topics = await _topicRepository.GetAllTopicsAsync();
+            var topics = await _topicRepository.GetAllTopicsAsync(x => x.State == State.Show);
             if (topics.Count == 0 || topics == null)
             {
                 throw new TopicNotFoundException();

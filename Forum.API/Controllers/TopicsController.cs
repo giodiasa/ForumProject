@@ -1,7 +1,9 @@
 ﻿using Forum.Application.DTOs;
+using Forum.Application.Identity;
 using Forum.Application.Interfaces;
 using Forum.Application.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -80,6 +82,19 @@ namespace Forum.API.Controllers
             _response.StatusCode = Convert.ToInt32(HttpStatusCode.OK);
             _response.Message = "Topic updated successfully";
 
+
+            return StatusCode(_response.StatusCode, _response);
+        }
+
+        [HttpPatch("state/{Id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateLockoutStatus(int Id, [FromBody] JsonPatchDocument<TopicForUpdatingDTO> patchDocument)
+        {
+            await _topicService.ChangeStateOfTopic(Id, patchDocument);
+            _response.Result = Id;
+            _response.IsSuccess = true;
+            _response.StatusCode = Convert.ToInt32(HttpStatusCode.OK);
+            _response.Message = "Request completed successfully";
 
             return StatusCode(_response.StatusCode, _response);
         }

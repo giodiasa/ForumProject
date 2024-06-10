@@ -6,6 +6,7 @@ using Forum.Infrastructure.Persistence;
 using Forum.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -73,7 +74,14 @@ namespace Forum.API
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IJwtGenerator, JwtGenerator>();
         }
-        public static void AddControllers(this WebApplicationBuilder builder) => builder.Services.AddControllers();
+        public static void AddControllers(this WebApplicationBuilder builder)
+        {
+            builder.Services.AddControllers(options =>
+            {
+                options.ReturnHttpNotAcceptable = true;
+                options.Filters.Add(new ProducesAttribute("application/json", "text/plain"));
+            }).AddNewtonsoftJson();
+        }
         public static void AddEndpointsApiExplorer(this WebApplicationBuilder builder) => builder.Services.AddEndpointsApiExplorer();
 
         public static void AddSwagger(this WebApplicationBuilder builder)
