@@ -10,6 +10,6 @@ namespace Forum.Application.Interfaces
         Task<UserDto> GetSingleUserByEmailAsync(string email);
         Task UpdateUserAsync(UserDto model);
         Task DeleteUserAsync(string Id);
-        Task LockUser(string userId, JsonPatchDocument<UserDto> patchDocument);
+        Task UpdateUserAsync(string userId, JsonPatchDocument<UserDto> patchDocument);
     }
 }

@@ -60,7 +60,7 @@ namespace Forum.Application.Services
             return result;
         }
 
-        public async Task LockUser(string userId, JsonPatchDocument<UserDto> patchDocument)
+        public async Task UpdateUserAsync(string userId, JsonPatchDocument<UserDto> patchDocument)
         {
             if(userId == null) throw new ArgumentNullException("Invalid argument passed");
             var user = await _userRepository.GetSingleUserAsync(x => x.Id == userId);

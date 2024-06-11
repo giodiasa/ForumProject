@@ -1,5 +1,6 @@
 ﻿using Forum.Application.Identity;
 using Forum.Application.Interfaces;
+using Forum.Application.Jobs;
 using Forum.Application.Services;
 using Forum.Core.Interfaces;
 using Forum.Infrastructure.Persistence;
@@ -17,6 +18,10 @@ namespace Forum.API
     public static class MiddlewareExtensions
     {
         public static void AddDatabaseContext(this WebApplicationBuilder builder) => builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("SQLServerLocalConnection")));
+        public static void AddBackgroundJobs(this WebApplicationBuilder builder)
+        {
+            builder.Services.AddHostedService<TopicActivityMonitorService>();
+        }
         public static void ConfigureJwtOptions(this WebApplicationBuilder builder) => builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("ApiSettings:JwtOptions"));
         public static void AddIdentity(this WebApplicationBuilder builder)
         {

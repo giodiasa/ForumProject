@@ -35,7 +35,7 @@ namespace Forum.Application.Services
             await _topicRepository.Save();
         }
 
-        public async Task ChangeStateOfTopic(int Id, JsonPatchDocument<TopicForUpdatingDTO> patchDocument)
+        public async Task UpdateTopicAsync(int Id, JsonPatchDocument<TopicForUpdatingDTO> patchDocument)
         {
             if (Id <= 0) throw new ArgumentOutOfRangeException("Invalid argument passed");
             var topic = await _topicRepository.GetSingleTopicAsync(x => x.Id == Id);

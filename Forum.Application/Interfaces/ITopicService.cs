@@ -13,6 +13,6 @@ namespace Forum.Application.Interfaces
         Task AddTopicAsync(TopicForCreatingDTO model);
         Task UpdateTopicAsync(TopicForUpdatingDTO model);
         Task DeleteTopicAsync(int Id);
-        Task ChangeStateOfTopic(int Id, JsonPatchDocument<TopicForUpdatingDTO> patchDocument);
+        Task UpdateTopicAsync(int Id, JsonPatchDocument<TopicForUpdatingDTO> patchDocument);
     }
 }

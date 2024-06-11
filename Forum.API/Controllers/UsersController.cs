@@ -74,11 +74,11 @@ namespace Forum.API.Controllers
             return StatusCode(_response.StatusCode, _response);
         }
 
-        [HttpPatch ("lockout/{userId}")]
+        [HttpPatch ("{userId}")]
         [Authorize(Roles ="Admin")]
-        public async Task<IActionResult> UpdateLockoutStatus(string userId, [FromBody] JsonPatchDocument<UserDto> patchDocument)
+        public async Task<IActionResult> UpdateUser(string userId, [FromBody] JsonPatchDocument<UserDto> patchDocument)
         {
-            await _userService.LockUser(userId, patchDocument);
+            await _userService.UpdateUserAsync(userId, patchDocument);
             _response.Result = userId;
             _response.IsSuccess = true;
             _response.StatusCode = Convert.ToInt32(HttpStatusCode.OK);
