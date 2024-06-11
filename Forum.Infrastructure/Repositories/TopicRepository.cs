@@ -19,6 +19,7 @@ namespace Forum.Infrastructure.Repositories
         {
             if (entity != null)
             {
+                entity.LastCommentDate = DateTime.Now;
                 await _context.Topics.AddAsync(entity);
             }
         }

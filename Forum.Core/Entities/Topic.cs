@@ -24,5 +24,6 @@ namespace Forum.Core.Entities
         [ForeignKey(nameof(IdentityUser))]
         public string UserId { get; set; } = string.Empty;
         public IdentityUser? IdentityUser { get; set; }
+        public DateTime LastCommentDate { get; set; }
     }
 }

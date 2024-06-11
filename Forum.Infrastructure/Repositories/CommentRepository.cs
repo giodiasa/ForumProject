@@ -18,6 +18,9 @@ namespace Forum.Infrastructure.Repositories
             if(entity != null)
             {
                 await _context.Comments.AddAsync(entity);
+                var topic = await _context.Topics.FirstOrDefaultAsync(x => x.Id == entity.TopicId);
+                topic!.LastCommentDate = DateTime.Now;
+                _context.Topics.Update(topic);
             }
         }
 
