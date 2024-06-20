@@ -1,8 +1,6 @@
 ﻿using Forum.Application.Identity;
 using Forum.Application.Interfaces;
-using Forum.Application.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -63,7 +61,7 @@ namespace Forum.API.Controllers
 
         [HttpPut]
         [Authorize]
-        public async Task<IActionResult> UpdateUser([FromForm]UserDto model)
+        public async Task<IActionResult> UpdateUser([FromForm] UserDto model)
         {
             await _userService.UpdateUserAsync(model);
             _response.Result = model;
@@ -74,8 +72,8 @@ namespace Forum.API.Controllers
             return StatusCode(_response.StatusCode, _response);
         }
 
-        [HttpPatch ("{userId}")]
-        [Authorize(Roles ="Admin")]
+        [HttpPatch("{userId}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateUser(string userId, [FromBody] JsonPatchDocument<UserDto> patchDocument)
         {
             await _userService.UpdateUserAsync(userId, patchDocument);

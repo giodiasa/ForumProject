@@ -1,5 +1,4 @@
-﻿using Forum.Application.DTOs;
-using Forum.Application.Identity;
+﻿using Forum.Application.Identity;
 using Microsoft.AspNetCore.JsonPatch;
 
 namespace Forum.Application.Interfaces

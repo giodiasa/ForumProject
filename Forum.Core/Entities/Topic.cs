@@ -22,8 +22,9 @@ namespace Forum.Core.Entities
         public Status Status { get; set; } = Status.Active;
         public List<Comment>? Comments { get; set; }
         [ForeignKey(nameof(IdentityUser))]
-        public string UserId { get; set; } = string.Empty;
+        public string? UserId { get; set; }
         public IdentityUser? IdentityUser { get; set; }
         public DateTime LastCommentDate { get; set; }
+        public string UserName { get; set; } = string.Empty;
     }
 }

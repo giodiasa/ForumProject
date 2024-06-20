@@ -5,6 +5,7 @@ using Forum.Core.Common.Enums;
 using Forum.Core.Common.Exceptions;
 using Forum.Core.Entities;
 using Forum.Core.Interfaces;
+using Forum.Infrastructure.Repositories;
 
 namespace Forum.Application.Services
 {
@@ -14,13 +15,15 @@ namespace Forum.Application.Services
         private readonly IMapper _mapper;
         private readonly IAuthService _authService;
         private readonly ITopicRepository _topicRepository;
+        private readonly IUserRepository _userRepository;
 
-        public CommentService(ICommentRepository commentRepository, IAuthService authService, ITopicRepository topicRepository)
+        public CommentService(ICommentRepository commentRepository, IAuthService authService, ITopicRepository topicRepository, IUserRepository userRepository)
         {
             _commentRepository = commentRepository;
             _mapper = MappingInitializer.Initialize();
             _authService = authService;
             _topicRepository = topicRepository;
+            _userRepository = userRepository;
         }
         public async Task AddCommentAsync(CommentForCreatingDTO model)
         {
@@ -34,6 +37,12 @@ namespace Forum.Application.Services
             var result = _mapper.Map<Comment>(model);
             result.CreationDate = DateTime.Now;
             result.UserId = _authService.GetAuthenticatedUserId();
+            var user = await _userRepository.GetSingleUserAsync(x => x.Id == _authService.GetAuthenticatedUserId());
+            if (user == null)
+            {
+                throw new UserNotFoundException();
+            }
+            result.UserName = user.UserName!;
             await _commentRepository.AddCommentAsync(result);
             await _commentRepository.Save();
         }
@@ -91,6 +100,7 @@ namespace Forum.Application.Services
             result.UserId = commentToUpdate.UserId;
             result.TopicId = commentToUpdate.TopicId;
             result.CreationDate = commentToUpdate.CreationDate;
+            result.UserName = commentToUpdate.UserName;
             await _commentRepository.UpdateCommentAsync(result);
             await _commentRepository.Save();
         }

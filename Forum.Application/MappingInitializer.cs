@@ -15,15 +15,12 @@ namespace Forum.Application
                 config.CreateMap<Topic, TopicForCreatingDTO>().ReverseMap();
                 config.CreateMap<Topic, TopicForUpdatingDTO>().ReverseMap();
                 config.CreateMap<Topic, TopicForGettingDTO>()
-                .ForMember(destination => destination.UserName, options => options.MapFrom(source => source.IdentityUser!.UserName))
                 .ForMember(destination => destination.NumberOfComments, options => options.MapFrom(source => source.Comments!.Count))
                 .ReverseMap();
 
                 config.CreateMap<Comment, CommentForCreatingDTO>().ReverseMap();
                 config.CreateMap<Comment, CommentForUpdatingDTO>().ReverseMap();
-                config.CreateMap<Comment, CommentForGettingDTO>()
-                .ForMember(destination => destination.UserName, options => options.MapFrom(source => source.IdentityUser!.UserName))
-                .ReverseMap();
+                config.CreateMap<Comment, CommentForGettingDTO>().ReverseMap();
 
                 config.CreateMap<UserDto, IdentityUser>().ReverseMap();
                 config.CreateMap<RegistrationRequestDTO, IdentityUser>()

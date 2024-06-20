@@ -16,12 +16,14 @@ namespace Forum.Application.Services
         private readonly ITopicRepository _topicRepository;
         private readonly IAuthService _authService;
         private readonly IMapper _mapper;
+        private readonly IUserRepository _userRepository;
 
-        public TopicService(ITopicRepository topicRepository, IAuthService authService)
+        public TopicService(ITopicRepository topicRepository, IAuthService authService, IUserRepository userRepository)
         {
             _topicRepository = topicRepository;
             _authService = authService;
             _mapper = MappingInitializer.Initialize();
+            _userRepository = userRepository;
         }
         public async Task AddTopicAsync(TopicForCreatingDTO model)
         {
@@ -31,6 +33,12 @@ namespace Forum.Application.Services
             result.UserId = _authService.GetAuthenticatedUserId();
             result.Status = Status.Active;
             result.State = State.Pending;
+            var user = await _userRepository.GetSingleUserAsync(x => x.Id == _authService.GetAuthenticatedUserId());
+            if(user == null)
+            {
+                throw new UserNotFoundException();
+            }
+            result.UserName = user.UserName!;
             await _topicRepository.AddTopicAsync(result);
             await _topicRepository.Save();
         }
@@ -96,6 +104,7 @@ namespace Forum.Application.Services
             var result = _mapper.Map<Topic>(model);
             result.CreationDate = topicToUpdate.CreationDate;
             result.UserId = topicToUpdate.UserId;
+            result.UserName = topicToUpdate.UserName;
             await _topicRepository.UpdateTopicAsync(result);
             await _topicRepository.Save();
         }

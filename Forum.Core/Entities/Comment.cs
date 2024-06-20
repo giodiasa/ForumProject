@@ -18,7 +18,8 @@ namespace Forum.Core.Entities
         public int TopicId { get; set; }
         public Topic? Topic { get; set; }
         [ForeignKey(nameof(IdentityUser))]
-        public string UserId { get; set; } = string.Empty;
+        public string? UserId { get; set; }
         public IdentityUser? IdentityUser { get; set; }
+        public string UserName { get; set; } = string.Empty;
     }
 }

@@ -29,7 +29,13 @@ namespace Forum.Infrastructure.Persistence
                 .HasOne(c => c.IdentityUser)
                 .WithMany()
                 .HasForeignKey(c => c.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.SetNull);
+
+            builder.Entity<Topic>()
+                .HasOne(c => c.IdentityUser)
+                .WithMany()
+                .HasForeignKey(c => c.UserId)
+                .OnDelete(DeleteBehavior.SetNull);
         }
 
         public DbSet<Topic> Topics { get; set; }
